@@ -8,13 +8,18 @@
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />
   <style>
     body {
-      background:#404040;
-      color:#f8f8f8;
-      font:500 20px/26px 'Helvetica Neue', Helvetica, Arial, Sans-serif;
-      margin:0;
-      padding:0;
-      -webkit-font-smoothing:antialiased;
-      }
+            color: #404040;
+            font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+          }
     .sidebar {
       width:33.3333%;
       }
@@ -31,11 +36,144 @@
       width:66.6666%;
       top:0;bottom:0;
       }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 400;
+      }
+      
+      a {
+        color: #404040;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        color: #101010;
+      }
+      
+      .heading {
+        background: #8B0000;
+        color: #ffffff;
+        border-bottom: 1px solid #eee;
+        min-height: 60px;
+        line-height: 60px;
+        padding: 0 10px;
+      }
+      
+      .listings {
+        height: 100%;
+        overflow: auto;
+        padding-bottom: 60px;
+      }
+      
+      .listings .item {
+        display: block;
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        text-decoration: none;
+      }
+      
+      .listings .item:last-child {
+        border-bottom: none;
+      }
+      
+      .listings .item .title {
+        display: block;
+        color: 	#8B0000;
+        font-weight: 700;
+      }
+      
+      .listings .item .title small {
+        font-weight: 400;
+      }
+      
+      .listings .item.active .title,
+      .listings .item .title:hover {
+        color: 	#8B0000;
+      }
+      
+      .listings .item.active {
+        background-color: #f8f8f8;
+      }
+      
+      ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+        border-left: 0;
+        background: rgba(0, 0, 0, 0.1);
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: none;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: 	#8B0000;
+        border-radius: 0;
+      }
+
+      .mapboxgl-popup-close-button {
+        display: none;
+      }
+      
+      .mapboxgl-popup-content {
+        font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+        padding: 0;
+        width: 180px;
+      }
+      
+      .mapboxgl-popup-content-wrapper {
+        padding: 1%;
+      }
+      
+      .mapboxgl-popup-content h3 {
+        background: 	#8B0000;
+        color: #fff;
+        margin: 0;
+        display: block;
+        padding: 10px;
+        border-radius: 3px 3px 0 0;
+        font-weight: 700;
+        margin-top: -15px;
+      }
+      
+      .mapboxgl-popup-content h4 {
+        margin: 0;
+        display: block;
+        padding: 10px;
+        font-weight: 400;
+      }
+      
+      .mapboxgl-popup-content div {
+        padding: 10px;
+      }
+      
+      .mapboxgl-container .leaflet-marker-icon {
+        cursor: pointer;
+      }
+      
+      .mapboxgl-popup-anchor-top > .mapboxgl-popup-content {
+        margin-top: 15px;
+      }
+      
+      .mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
+        border-bottom-color: 	#8B0000;
+      }
+
+      .mapboxgl-popup {
+        padding-bottom: 50px;
+      }
   </style>
 </head>
 <body>
 <div class='sidebar pad2'>Listing</div>
 <div id='map' class='map pad2'>Map</div>
+<div class='sidebar'>
+        <div class='heading'>
+          <h1>Institutos</h1>
+        </div>
+        <div id='listings' class='listings'></div>
+</div>
 <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoibGV0aWNpYXNnIiwiYSI6ImNqOWFuY2VwaTE2a2kyeHFtZnJlMGs4dmgifQ.oeQwk_rI1bh4v2Kk5XiH7g';
         // This adds the map to your page
@@ -49,6 +187,156 @@
           // initial zoom
           zoom: 14
         });
+
+        var stores = {
+            "type": "FeatureCollection",
+            "features": [
+            {
+              "type": "Feature",
+              "properties": {
+                "sigla": "IB"
+              },
+              "geometry": {
+                "coordinates": [
+                  -47.069388,
+                  -22.819357
+                ],
+                "type": "Point"
+              },
+              "id": "91054341eebcf0245ded4964ee35f7f0"
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "sigla": "IQ"
+              },
+              "geometry": {
+                "coordinates": [
+                  -47.067722,
+                  -22.8185
+                ],
+                "type": "Point"
+              },
+              "id": "916c44673b6e5460338a5b5e3c716f3d"
+            }
+          ]
+            };
+            // This adds the data to the map
+            map.on('load', function (e) {
+                // Add the data to your map as a layer
+                map.addLayer({
+                "id": "locations",
+              "type": "symbol",
+              // Add a GeoJSON source containing place coordinates and information.
+              "source": {
+                "type": "geojson",
+                "data": stores
+              },
+              "layout": {
+                "icon-image": "college-15",
+                "icon-allow-overlap": true,
+              }
+            });
+            // Initialize the list
+            buildLocationList(stores);
+            });
+
+            // Add an event listener for when a user clicks on the map
+map.on('click', function(e) {
+    // Query all the rendered points in the view
+    var features = map.queryRenderedFeatures(e.point, { layers: ['locations'] });
+    if (features.length) {
+      var clickedPoint = features[0];
+      // 1. Fly to the point
+      flyToStore(clickedPoint);
+      // 2. Close all other popups and display popup for clicked store
+      createPopUp(clickedPoint);
+      // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+      var activeItem = document.getElementsByClassName('active');
+      if (activeItem[0]) {
+        activeItem[0].classList.remove('active');
+      }
+      // Find the index of the store.features that corresponds to the clickedPoint that fired the event listener
+      var selectedFeature = clickedPoint.properties.address;
+  
+      for (var i = 0; i < stores.features.length; i++) {
+        if (stores.features[i].properties.address === selectedFeature) {
+          selectedFeatureIndex = i;
+        }
+      }
+      // Select the correct list item using the found index and add the active class
+      var listing = document.getElementById('listing-' + selectedFeatureIndex);
+      listing.classList.add('active');
+    }
+  });
+            function buildLocationList(data) {
+                for (i = 0; i < data.features.length; i++) {
+                  // Create an array of all the stores and their properties
+                  var currentFeature = data.features[i];
+                  // Shorten data.feature.properties to just `prop` so we're not
+                  // writing this long form over and over again.
+                  var prop = currentFeature.properties;
+                  // Select the listing container in the HTML
+                  var listings = document.getElementById('listings');
+                  // Append a div with the class 'item' for each store 
+                  var listing = listings.appendChild(document.createElement('div'));
+                  listing.className = 'item';
+                  listing.id = "listing-" + i;
+            
+                  // Create a new link with the class 'title' for each store 
+                  // and fill it with the store address
+                  var link = listing.appendChild(document.createElement('a'));
+                  link.href = '#';
+                  link.className = 'title';
+                  link.dataPosition = i;
+                  link.innerHTML = prop.sigla;
+            
+                  // Create a new div with the class 'details' for each store 
+                  // and fill it with the city and phone number
+                  var details = listing.appendChild(document.createElement('div'));
+                  details.innerHTML = prop.sigla;
+                  if (prop.phone) {
+                    details.innerHTML += ' &middot; ' + prop.phoneFormatted;
+                  }
+                  
+                  // Add an event listener for the links in the sidebar listing
+link.addEventListener('click', function(e) {
+    // Update the currentFeature to the store associated with the clicked link
+    var clickedListing = data.features[this.dataPosition];
+    // 1. Fly to the point associated with the clicked link
+    flyToStore(clickedListing);
+    // 2. Close all other popups and display popup for clicked store
+    createPopUp(clickedListing);
+    // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+    var activeItem = document.getElementsByClassName('active');
+    if (activeItem[0]) {
+      activeItem[0].classList.remove('active');
+    }
+    this.parentNode.classList.add('active');
+  });
+
+  
+                }
+              }
+
+              function flyToStore(currentFeature) {
+                map.flyTo({
+                  center: currentFeature.geometry.coordinates,
+                  zoom: 15
+                });
+              }
+              
+              function createPopUp(currentFeature) {
+                var popUps = document.getElementsByClassName('mapboxgl-popup');
+                // Check if there is already a popup on the map and if so, remove it
+                if (popUps[0]) popUps[0].remove();
+              
+                var popup = new mapboxgl.Popup({ closeOnClick: false })
+                  .setLngLat(currentFeature.geometry.coordinates)
+                  .setHTML('<h3>'+ currentFeature.properties.sigla + '</h3>' +
+                    '<h4>' + currentFeature.properties.sigla + '</h4><h4><a href="https://pt.wikihow.com/Adicionar-um-Hiperlink-com-HTML" onclick="runMyFunction(); return true;">  Clica em mim!</a>' + '</h4>')
+                  .addTo(map);
+              }
 </script>
 </body>
 </html>
